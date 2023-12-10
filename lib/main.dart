@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-
 void main() {
   runApp(const MyApp());
 }
@@ -40,7 +39,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-// API authenticated activity, heartrate, sleep, and temperature
+// API authenticated activity, heartrate, sleep, and temperature (note: heartrate needs authentication for resting HR in activity)
 // I think I will display the activities (steps, active minutes (light and very active), resting heartrate)
 // For sleep ((in hours and minutes) asleep, awake, light, deep, REM)
 // For temperature, skin's relative temperature from baseline
