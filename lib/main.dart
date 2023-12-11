@@ -34,23 +34,24 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  // int _counter = 0;
+
+  // Initialize the API responses
   late Future<Summary> futureActivitySummaries;
   late Future<SleepDataSummary> futureSleepSummaries;
   late Future<List<TempSkin>> futureTemperatures;
 
   @override
   void initState() {
-    print('in InitState getting statistics');
+    // Set the API responses
     futureActivitySummaries = fetchActivityData();
     futureSleepSummaries = fetchSleepData();
     futureTemperatures = fetchTemperatureData();
-    print('Future summary is ${futureActivitySummaries}');
   }
 
   void _incrementCounter() {
     setState(() {
-      _counter++;
+      // _counter++;
     });
   }
 
@@ -71,7 +72,7 @@ class _MyHomePageState extends State<MyHomePage> {
             builder: (context, snapshot) {
               if(snapshot == null || snapshot.connectionState == ConnectionState.none){
                 return Container();
-                //TODO: add loading text field
+
               }
               Summary activitySummary = snapshot.data!;
               return Center(
