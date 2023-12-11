@@ -9,7 +9,7 @@ Future<Summary> fetchActivityData() async {
 
   final headers = {
     'accept': 'application/json',
-    'authorization': 'Bearer YOUR_ACTUAL_API_KEY',
+    'authorization': 'Bearer API_KEY',
   };
 
   final response = await http.get(url, headers: headers);
@@ -28,7 +28,7 @@ Future<SleepDataSummary> fetchSleepData() async {
 
   final headers = {
     'accept': 'application/json',
-    'authorization': 'Bearer YOUR_ACTUAL_API_KEY',
+    'authorization': 'Bearer API_KEY',
   };
 
   final response = await http.get(url, headers: headers);
@@ -47,7 +47,7 @@ Future<List<TempSkin>> fetchTemperatureData() async {
 
   final headers = {
     'accept': 'application/json',
-    'authorization': 'Bearer YOUR_ACTUAL_API_KEY',
+    'authorization': 'Bearer API_KEY',
   };
 
   final response = await http.get(url, headers: headers);
