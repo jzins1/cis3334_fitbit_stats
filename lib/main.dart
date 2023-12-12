@@ -66,29 +66,36 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-
-        body: FutureBuilder(
+      body: Column(
+        children: [
+          const Text(
+            'Your Fitbit statistics (today):',
+            style: TextStyle(
+              fontSize: 36,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          FutureBuilder(
             future: futureActivitySummaries,
             builder: (context, snapshot) {
-              if(snapshot == null || snapshot.connectionState == ConnectionState.none){
+              if (snapshot == null || snapshot.connectionState == ConnectionState.none) {
                 return Container();
-
               }
+
               Summary activitySummary = snapshot.data!;
+              int totalActivityMinutes = activitySummary.fairlyActiveMinutes +
+                  activitySummary.veryActiveMinutes;
+
               return Center(
                 child: Column(
-                  // mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    const Text(
-                        'Your Fitbit statistics (today):',
-                        style: TextStyle(
-                          fontSize: 36,
-                          fontWeight: FontWeight.bold,
-                        )
-                    ),
+                  children: [
                     Text('Number of steps: ${activitySummary.steps.toString()}'),
-                    Text('Total minutes of activity: 67 (46 light and 21 very active)'),
-                    Text('Resting heart rate: 60 BPM'),
+                    Text(
+                      'Total minutes of activity: ${totalActivityMinutes} min '
+                          '(${activitySummary.fairlyActiveMinutes.toString()} min light and '
+                          '${activitySummary.veryActiveMinutes.toString()} min very active)',
+                    ),
+                    Text('Resting heart rate: ${activitySummary.restingHeartRate} BPM'),
                     Text('Total time in bed: 16 hours 24 minutes'),
                     Text('Total time asleep: 14 hours 22 minutes'),
                     Text('Total time awake: 2 hours 2 minutes'),
@@ -96,25 +103,46 @@ class _MyHomePageState extends State<MyHomePage> {
                     Text('Total time in deep sleep: 1 hour 48 minutes'),
                     Text('Total time in REM sleep: 3 hours 21 minutes'),
                     Text('Relative skin temperature (from baseline in degrees F): 1.7'),
-
-              // const Text(
-              //   'You have pushed the button this many times:',
-              // ),
-              // Text(
-              //   '$_counter',
-              //   style: Theme.of(context).textTheme.headlineMedium,
-              // ),
-            ],
+                  ],
+                ),
+              );
+            },
           ),
-        );
-        // floatingActionButton: FloatingActionButton(
-        //   onPressed: _incrementCounter,
-        //   tooltip: 'Increment',
-        //   child: const Icon(Icons.add),
-        // ), // This trailing comma makes auto-formatting nicer for build methods.
+          FutureBuilder(
+            future: futureActivitySummaries,
+            builder: (context, snapshot) {
+              if (snapshot == null || snapshot.connectionState == ConnectionState.none) {
+                return Container();
+              }
 
-      }
-    ),
+              Summary activitySummary = snapshot.data!;
+              int totalActivityMinutes = activitySummary.fairlyActiveMinutes +
+                  activitySummary.veryActiveMinutes;
+
+              return Center(
+                child: Column(
+                  children: [
+                    Text('Number of steps: ${activitySummary.steps.toString()}'),
+                    Text(
+                      'Total minutes of activity: ${totalActivityMinutes} min '
+                          '(${activitySummary.fairlyActiveMinutes.toString()} min light and '
+                          '${activitySummary.veryActiveMinutes.toString()} min very active)',
+                    ),
+                    Text('Resting heart rate: ${activitySummary.restingHeartRate} BPM'),
+                    Text('Total time in bed: 16 hours 24 minutes'),
+                    Text('Total time asleep: 14 hours 22 minutes'),
+                    Text('Total time awake: 2 hours 2 minutes'),
+                    Text('Total time in light sleep: 9 hours 13 minutes'),
+                    Text('Total time in deep sleep: 1 hour 48 minutes'),
+                    Text('Total time in REM sleep: 3 hours 21 minutes'),
+                    Text('Relative skin temperature (from baseline in degrees F): 1.7'),
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
 }
