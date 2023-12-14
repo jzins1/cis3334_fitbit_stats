@@ -55,6 +55,12 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  String _convertMinToHrMin(int numMinutes) {
+    int hours = (numMinutes / 60).floor();
+    int minutes = numMinutes % 60;
+    return (numMinutes >= 60) ? '${hours} hours ${minutes} minutes' : '${minutes} minutes';
+  }
+
 // API authenticated activity, heartrate, sleep, and temperature (note: heartrate needs authentication for resting HR in activity)
 // I think I will display the activities (steps, active minutes (light and very active), resting heartrate)
 // For sleep ((in hours and minutes) asleep, awake, light, deep, REM)
@@ -96,46 +102,48 @@ class _MyHomePageState extends State<MyHomePage> {
                           '${activitySummary.veryActiveMinutes.toString()} min very active)',
                     ),
                     Text('Resting heart rate: ${activitySummary.restingHeartRate} BPM'),
-                    Text('Total time in bed: 16 hours 24 minutes'),
-                    Text('Total time asleep: 14 hours 22 minutes'),
-                    Text('Total time awake: 2 hours 2 minutes'),
-                    Text('Total time in light sleep: 9 hours 13 minutes'),
-                    Text('Total time in deep sleep: 1 hour 48 minutes'),
-                    Text('Total time in REM sleep: 3 hours 21 minutes'),
-                    Text('Relative skin temperature (from baseline in degrees F): 1.7'),
                   ],
                 ),
               );
             },
           ),
           FutureBuilder(
-            future: futureActivitySummaries,
+            future: futureSleepSummaries,
             builder: (context, snapshot) {
               if (snapshot == null || snapshot.connectionState == ConnectionState.none) {
                 return Container();
               }
 
-              Summary activitySummary = snapshot.data!;
-              int totalActivityMinutes = activitySummary.fairlyActiveMinutes +
-                  activitySummary.veryActiveMinutes;
+              SleepDataSummary sleepSummary = snapshot.data!;
 
               return Center(
                 child: Column(
                   children: [
-                    Text('Number of steps: ${activitySummary.steps.toString()}'),
-                    Text(
-                      'Total minutes of activity: ${totalActivityMinutes} min '
-                          '(${activitySummary.fairlyActiveMinutes.toString()} min light and '
-                          '${activitySummary.veryActiveMinutes.toString()} min very active)',
-                    ),
-                    Text('Resting heart rate: ${activitySummary.restingHeartRate} BPM'),
-                    Text('Total time in bed: 16 hours 24 minutes'),
-                    Text('Total time asleep: 14 hours 22 minutes'),
-                    Text('Total time awake: 2 hours 2 minutes'),
-                    Text('Total time in light sleep: 9 hours 13 minutes'),
-                    Text('Total time in deep sleep: 1 hour 48 minutes'),
-                    Text('Total time in REM sleep: 3 hours 21 minutes'),
-                    Text('Relative skin temperature (from baseline in degrees F): 1.7'),
+                    Text('Total time in bed: ${_convertMinToHrMin(sleepSummary.totalTimeInBed)}'),
+                    Text('Total time asleep: ${_convertMinToHrMin(sleepSummary.totalMinutesAsleep)}'),
+                    Text('Total time awake: ${_convertMinToHrMin(sleepSummary.stages.wake)}'),
+                    Text('Total time in light sleep: ${_convertMinToHrMin(sleepSummary.stages.light)}'),
+                    Text('Total time in deep sleep: ${_convertMinToHrMin(sleepSummary.stages.deep)}'),
+                    Text('Total time in REM sleep: ${_convertMinToHrMin(sleepSummary.stages.rem)}'),
+                  ],
+                ),
+              );
+            },
+          ),
+          FutureBuilder(
+            future: futureTemperatures,
+            builder: (context, snapshot) {
+              if (snapshot == null || snapshot.connectionState == ConnectionState.none) {
+                return Container();
+              }
+
+              List<TempSkin> tempSkin = snapshot.data!;
+
+              return Center(
+                child: Column(
+                  children: [
+                    Text('Relative skin temperature (from baseline in degrees F): '
+                        '${tempSkin[0].value.nightlyRelative.toString()}'),
                   ],
                 ),
               );
