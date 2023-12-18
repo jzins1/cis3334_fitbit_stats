@@ -42,18 +42,39 @@ class _MyHomePageState extends State<MyHomePage> {
   late Future<SleepDataSummary> futureSleepSummaries;
   late Future<List<TempSkin>> futureTemperatures;
 
+  // Initialize the calendar
+  DateTime selectedDate = DateTime.now();
+
   @override
   void initState() {
     // Set the API responses
-    futureActivitySummaries = fetchActivityData();
-    futureSleepSummaries = fetchSleepData();
-    futureTemperatures = fetchTemperatureData();
+    futureActivitySummaries = fetchActivityData("2023-12-05");
+    futureSleepSummaries = fetchSleepData("2023-12-02");
+    futureTemperatures = fetchTemperatureData("2023-12-13");
   }
 
-  void _incrementCounter() {
-    setState(() {
-      // _counter++;
-    });
+  // void _incrementCounter() {
+  //   setState(() {
+  //     // _counter++;
+  //   });
+  // }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: selectedDate,
+        firstDate: DateTime(2015, 8),
+        lastDate: DateTime(2101));
+    if (picked != null && picked != selectedDate) {
+      setState(() {
+        selectedDate = picked;
+        // selectedDate = "${picked.year.toString()}-${picked.month.toString()}-${picked.day.toString()}";
+        print("Selected date is ${selectedDate}");
+        futureActivitySummaries = fetchActivityData("2023-12-05");
+        futureSleepSummaries = fetchSleepData("2023-12-02");
+        futureTemperatures = fetchTemperatureData("2023-12-13");
+      });
+    }
   }
 
   String _convertMinToHrMin(int numMinutes) {
@@ -78,27 +99,12 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           children: [
             const Text(
-              'Your Fitbit statistics (today):',
+              'Your Fitbit statistics:',
               style: TextStyle(
                 fontSize: 36,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            // EventCalendar(
-            //   calendarType: CalendarType.JALALI,
-            //   calendarLanguage: 'fa',
-            //   events: [
-            //     Event(
-            //       child: const Text('Laravel Event'),
-            //       dateTime: CalendarDateTime(
-            //         year: 1401,
-            //         month: 5,
-            //         day: 12,
-            //         calendarType: CalendarType.JALALI,
-            //       ),
-            //     ),
-            //   ],
-            // ),
             FutureBuilder(
               future: futureActivitySummaries,
               builder: (context, snapshot) {
@@ -197,6 +203,11 @@ class _MyHomePageState extends State<MyHomePage> {
                   );
                 }
               },
+            ),
+            Text(''),
+            ElevatedButton(
+              onPressed: () => _selectDate(context),
+              child: const Text('Select date'),
             ),
           ],
         ),
