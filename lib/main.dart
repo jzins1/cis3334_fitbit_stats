@@ -50,9 +50,10 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     // Set the API responses
-    futureActivitySummaries = fetchActivityData("2023-12-05");
-    futureSleepSummaries = fetchSleepData("2023-12-02");
-    futureTemperatures = fetchTemperatureData("2023-12-13");
+    DateTime currentDate = DateTime.now();
+    futureActivitySummaries = fetchActivityData(_formatDate(currentDate));
+    futureSleepSummaries = fetchSleepData(_formatDate(currentDate));
+    futureTemperatures = fetchTemperatureData(_formatDate(currentDate));
   }
 
   String _formatDate(DateTime dateTime) {
@@ -147,25 +148,18 @@ class _MyHomePageState extends State<MyHomePage> {
             FutureBuilder(
               future: futureActivitySummaries,
               builder: (context, snapshot) {
-                print("Entering builder");
-                print("Snapshot is ${snapshot}");
                 if (snapshot == null || snapshot.connectionState == ConnectionState.waiting) {
                   return Container();
                 }
 
-                print("Snapshot is ${snapshot}");
-
                 if(snapshot.data! == null) {
                   return Container();
                 } else {
-                  print("Snapshot is ${snapshot}");
                   Summary activitySummary = snapshot.data!;
-                  print("Activity Minutes " + activitySummary.fairlyActiveMinutes.toString());
                   int totalActivityMinutes = activitySummary
                       .fairlyActiveMinutes +
                       activitySummary.veryActiveMinutes;
 
-                  print("Snapshot is ${snapshot}");
                   return Center(
                     child: Column(
                       children: [
