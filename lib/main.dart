@@ -3,7 +3,7 @@ import 'activity_model.dart';
 import 'sleep_model.dart';
 import 'temperature_model.dart';
 import 'rest_api.dart';
-import 'package:flutter_event_calendar/flutter_event_calendar.dart';
+import 'package:intl/intl.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Fitbit Statistics',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.tealAccent),
         useMaterial3: true,
       ),
       home: const MyHomePage(title: 'Fitbit Statistics'),
@@ -43,7 +43,9 @@ class _MyHomePageState extends State<MyHomePage> {
   late Future<List<TempSkin>> futureTemperatures;
 
   // Initialize the calendar
-  DateTime selectedDate = DateTime.now();
+  DateTime activityDate = DateTime.now();
+  DateTime sleepDate = DateTime.now();
+  DateTime tempDate = DateTime.now();
 
   @override
   void initState() {
@@ -53,26 +55,47 @@ class _MyHomePageState extends State<MyHomePage> {
     futureTemperatures = fetchTemperatureData("2023-12-13");
   }
 
-  // void _incrementCounter() {
-  //   setState(() {
-  //     // _counter++;
-  //   });
-  // }
+  String _formatDate(DateTime dateTime) {
+    return "${dateTime.year.toString()}-${dateTime.month.toString()}-${dateTime.day.toString()}";
+  }
 
-  Future<void> _selectDate(BuildContext context) async {
+  Future<void> _selectActivityDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
         context: context,
-        initialDate: selectedDate,
+        initialDate: activityDate,
         firstDate: DateTime(2015, 8),
         lastDate: DateTime(2101));
-    if (picked != null && picked != selectedDate) {
+    if (picked != null && picked != activityDate) {
       setState(() {
-        selectedDate = picked;
-        // selectedDate = "${picked.year.toString()}-${picked.month.toString()}-${picked.day.toString()}";
-        print("Selected date is ${selectedDate}");
-        futureActivitySummaries = fetchActivityData("2023-12-05");
-        futureSleepSummaries = fetchSleepData("2023-12-02");
-        futureTemperatures = fetchTemperatureData("2023-12-13");
+        activityDate = picked;
+        futureActivitySummaries = fetchActivityData(_formatDate(activityDate));
+      });
+    }
+  }
+
+  Future<void> _selectSleepDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: sleepDate,
+        firstDate: DateTime(2015, 8),
+        lastDate: DateTime(2101));
+    if (picked != null && picked != sleepDate) {
+      setState(() {
+        sleepDate = picked;
+        futureSleepSummaries = fetchSleepData(_formatDate(sleepDate));
+      });
+    }
+  }
+
+  Future<void> _selectTempDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: tempDate,
+        firstDate: DateTime(2015, 8),
+        lastDate: DateTime(2101));
+    if (picked != null && picked != tempDate) {
+      setState(() {
+        futureTemperatures = fetchTemperatureData(_formatDate(tempDate));
       });
     }
   }
@@ -95,13 +118,29 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: SizedBox(
-        height: 500,
+        height: 1000,
         child: Column(
           children: [
             const Text(
               'Your Fitbit statistics:',
               style: TextStyle(
                 fontSize: 36,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(''),
+            ElevatedButton(
+              onPressed: () => _selectActivityDate(context),
+              child: const Text('Activity date'),
+              style: ElevatedButton.styleFrom(
+                onPrimary: Colors.orangeAccent,
+              ),
+            ),
+            const Text(
+              'Activity data:',
+              style: TextStyle(
+                color: Colors.orange,
+                fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -130,22 +169,46 @@ class _MyHomePageState extends State<MyHomePage> {
                   return Center(
                     child: Column(
                       children: [
+                        // Text('Number of steps: ${activitySummary.steps
+                        //     .toString()}'),
                         Text('Number of steps: ${activitySummary.steps
-                            .toString()}'),
+                            .toString()}', style: TextStyle(color: Colors.orange)),
                         Text(
-                          'Total minutes of activity: ${totalActivityMinutes} min '
-                              '(${activitySummary.fairlyActiveMinutes
-                              .toString()} min light and '
-                              '${activitySummary.veryActiveMinutes
-                              .toString()} min very active)',
-                        ),
+                        'Total minutes of activity: ${totalActivityMinutes} min '
+                        '(${activitySummary.fairlyActiveMinutes
+                            .toString()} min light and '
+                        '${activitySummary.veryActiveMinutes
+                            .toString()} min very active)', style: TextStyle(color: Colors.orange)),
+                        // Text(
+                        //   'Total minutes of activity: ${totalActivityMinutes} min '
+                        //       '(${activitySummary.fairlyActiveMinutes
+                        //       .toString()} min light and '
+                        //       '${activitySummary.veryActiveMinutes
+                        //       .toString()} min very active)'
+                        // ),
                         Text('Resting heart rate: ${activitySummary
-                            .restingHeartRate} BPM'),
+                            .restingHeartRate} BPM', style: TextStyle(color: Colors.orange)),
                       ],
                     ),
                   );
                 }
               },
+            ),
+            Text(''),
+            ElevatedButton(
+              onPressed: () => _selectSleepDate(context),
+              child: const Text('Sleep date'),
+              style: ElevatedButton.styleFrom(
+                onPrimary: Colors.purpleAccent,
+              ),
+            ),
+            const Text(
+              'Sleep data:',
+              style: TextStyle(
+                color: Colors.purple,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             FutureBuilder(
               future: futureSleepSummaries,
@@ -162,22 +225,38 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: Column(
                       children: [
                         Text('Total time in bed: ${_convertMinToHrMin(
-                            sleepSummary.totalTimeInBed)}'),
+                            sleepSummary.totalTimeInBed)}', style: TextStyle(color: Colors.purple)),
                         Text('Total time asleep: ${_convertMinToHrMin(
-                            sleepSummary.totalMinutesAsleep)}'),
+                            sleepSummary.totalMinutesAsleep)}', style: TextStyle(color: Colors.purple)),
                         Text('Total time awake: ${_convertMinToHrMin(
-                            sleepSummary.stages.wake)}'),
+                            sleepSummary.stages.wake)}', style: TextStyle(color: Colors.purple)),
                         Text('Total time in light sleep: ${_convertMinToHrMin(
-                            sleepSummary.stages.light)}'),
+                            sleepSummary.stages.light)}', style: TextStyle(color: Colors.purple)),
                         Text('Total time in deep sleep: ${_convertMinToHrMin(
-                            sleepSummary.stages.deep)}'),
+                            sleepSummary.stages.deep)}', style: TextStyle(color: Colors.purple)),
                         Text('Total time in REM sleep: ${_convertMinToHrMin(
-                            sleepSummary.stages.rem)}'),
+                            sleepSummary.stages.rem)}', style: TextStyle(color: Colors.purple)),
                       ],
                     ),
                   );
                 }
               },
+            ),
+            Text(''),
+            ElevatedButton(
+              onPressed: () => _selectTempDate(context),
+              child: const Text('Temperature date'),
+              style: ElevatedButton.styleFrom(
+                onPrimary: Colors.greenAccent,
+              ),
+            ),
+            const Text(
+              'Temperature data:',
+              style: TextStyle(
+                color: Colors.green,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             FutureBuilder(
               future: futureTemperatures,
@@ -197,7 +276,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         Text(
                             'Relative skin temperature (from baseline in degrees F): '
                                 '${tempSkin[0].value.nightlyRelative
-                                .toString()}'),
+                                .toString()}', style: TextStyle(color: Colors.green)),
                       ],
                     ),
                   );
@@ -205,10 +284,6 @@ class _MyHomePageState extends State<MyHomePage> {
               },
             ),
             Text(''),
-            ElevatedButton(
-              onPressed: () => _selectDate(context),
-              child: const Text('Select date'),
-            ),
           ],
         ),
       ),

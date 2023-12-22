@@ -31,7 +31,7 @@ dependencies:
   flutter:
     sdk: flutter
   http: ^1.1.0 # For making HTTP requests (need 1.1.0 or SDK needs to get upgraded)
-  flutter_event_calendar: ^1.0.0 # For adding a calendar widget
+  intl: ^0.17.0
 
 
 
